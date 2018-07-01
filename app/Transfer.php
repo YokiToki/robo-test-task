@@ -5,6 +5,7 @@ namespace App;
 use App\Http\Helpers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Transfer extends Model
 {
@@ -68,6 +69,7 @@ class Transfer extends Model
     {
         $transfers = static::query()
             ->where('user_id', '=', Auth::id())
+            ->where('status', '=', self::STATUS_WAIT)
             ->get();
 
         $total = $transfers->reduce(function ($carry, $item) {
@@ -75,5 +77,40 @@ class Transfer extends Model
         });
 
         return $total;
+    }
+
+    /**
+     * Проведение переводов средств, влияние на балансы балансов
+     *
+     * @throws \Exception
+     */
+    public static function completeAll()
+    {
+        $transfers = static::query()
+            ->where('status', '=', self::STATUS_WAIT)
+            ->where('transfer_at', '<', 'now()')
+            ->get();
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($transfers as $transfer) {
+                $from = Balance::getLast($transfer->user_id)->replicate();
+                $from->amount -= $transfer->amount;
+                $from->save();
+
+                $to = Balance::getLast($transfer->to_user_id)->replicate();
+                $to->amount += $transfer->amount;
+                $to->save();
+
+                $transfer->status = self::STATUS_READY;
+                $transfer->save();
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        DB::commit();
     }
 }

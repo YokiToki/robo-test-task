@@ -5,6 +5,7 @@ namespace App;
 use App\Http\Helpers;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
@@ -36,7 +37,8 @@ class User extends Authenticatable
      */
     public function getBalanceAttribute()
     {
-        $balance = Balance::getLast();
+        $user_id = Auth::id();
+        $balance = Balance::getLast($user_id);
 
         if ($balance) {
             return Helpers::longToMoney($balance->amount);
@@ -52,7 +54,8 @@ class User extends Authenticatable
      */
     public function getAvailableBalanceAttribute()
     {
-        $balance = Balance::getLast();
+        $user_id = Auth::id();
+        $balance = Balance::getLast($user_id);
         $transfers = Transfer::sumCurrentUser();
 
         if ($balance) {

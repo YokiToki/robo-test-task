@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class Balance extends Model
 {
@@ -35,10 +34,10 @@ class Balance extends Model
      *
      * @return mixed
      */
-    public static function getLast()
+    public static function getLast($user_id)
     {
         $balance = static::query()
-            ->where('user_id', Auth::id())
+            ->where('user_id', $user_id)
             ->orderByRaw('id desc, created_at desc')
             ->first();
 
