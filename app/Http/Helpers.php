@@ -22,4 +22,14 @@ class Helpers
         return $money;
     }
 
+    /**
+     * @param string $value
+     * @return string
+     */
+    public static function moneyToLong(string $value)
+    {
+        $money = $value * 100;
+
+        return $money;
+    }
 }

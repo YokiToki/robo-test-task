@@ -41,6 +41,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('home') }}">Список пользователей</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('transfer') }}">Новый перевод</a>
+                        </li>
                     @endauth
                 </ul>
 
@@ -53,7 +56,11 @@
                     </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link" href="#">{{ Auth::user()->balance }} руб.</a>
+                            <a class="nav-link" href="#" style="font-weight: bold">
+                                <span style="color: green">{{ Auth::user()->available_balance }}</span>
+                                / {{ Auth::user()->balance }}
+                                руб.
+                            </a>
                         </li>
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"

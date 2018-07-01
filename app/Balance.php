@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Balance extends Model
 {
@@ -28,4 +29,19 @@ class Balance extends Model
     protected $fillable = [
         'user_id', 'amount',
     ];
+
+    /**
+     * Возвращает баланс пользователя либо null
+     *
+     * @return mixed
+     */
+    public static function getLast()
+    {
+        $balance = static::query()
+            ->where('user_id', Auth::id())
+            ->orderByRaw('id desc, created_at desc')
+            ->first();
+
+        return $balance;
+    }
 }

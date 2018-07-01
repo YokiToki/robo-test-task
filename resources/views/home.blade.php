@@ -19,7 +19,8 @@
                                 <li class="list-group-item">{{ $user->name }} ({{ $user->email }})<br>
                                     @if(!is_null($user->to_user_id))
                                         <small>Перевод на сумму {{ $user->amount }} руб. для {{ $user->to_name }}
-                                            ({{ $user->to_email }})
+                                            ({{ $user->to_email }})<br>
+                                            {{ $user->status == \App\Transfer::STATUS_WAIT ? 'Ожидает завершения' : 'Завершен' }}
                                         </small>
                                     @else
                                         <small>Переводов нет</small>

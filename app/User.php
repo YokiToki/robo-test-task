@@ -5,7 +5,6 @@ namespace App;
 use App\Http\Helpers;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
@@ -31,16 +30,13 @@ class User extends Authenticatable
     ];
 
     /**
-     * Возвращает баланс пользователя для отображения
+     * Возвращает текущий баланс пользователя для отображения
      *
      * @return string
      */
     public function getBalanceAttribute()
     {
-        $balance = DB::table('balances')
-            ->where('user_id', $this->id)
-            ->orderBy('created_at', 'desc')
-            ->first();
+        $balance = Balance::getLast();
 
         if ($balance) {
             return Helpers::longToMoney($balance->amount);
@@ -50,9 +46,26 @@ class User extends Authenticatable
     }
 
     /**
+     * Возвращает текущий доступный баланс пользователя для отображения
+     *
+     * @return string
+     */
+    public function getAvailableBalanceAttribute()
+    {
+        $balance = Balance::getLast();
+        $transfers = Transfer::sumCurrentUser();
+
+        if ($balance) {
+            return Helpers::longToMoney($balance->amount - $transfers);
+        }
+
+        return Helpers::longToMoney(0);
+    }
+
+    /**
      * Возвращает всех пользователей с их последим созданным перевдом
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public static function allWithTransfers()
     {
