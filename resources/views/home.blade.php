@@ -5,7 +5,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">Dashboard</div>
+                    <div class="card-header">Пользователи и их последие переводы</div>
 
                     <div class="card-body">
                         @if (session('status'))
@@ -14,7 +14,19 @@
                             </div>
                         @endif
 
-                        You are logged in!
+                        <ul class="list-group">
+                            @foreach ($users as $user)
+                                <li class="list-group-item">{{ $user->name }} ({{ $user->email }})<br>
+                                    @if(!is_null($user->to_user_id))
+                                        <small>Перевод на сумму {{ $user->amount }} руб. для {{ $user->to_name }}
+                                            ({{ $user->to_email }})
+                                        </small>
+                                    @else
+                                        <small>Переводов нет</small>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
